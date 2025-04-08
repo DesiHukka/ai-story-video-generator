@@ -1,0 +1,6 @@
+file 'A:\AI Projects\AI Video Creator\backend\temp_video_parts\scene_1.mp4'
+file 'A:\AI Projects\AI Video Creator\backend\temp_video_parts\scene_2.mp4'
+file 'A:\AI Projects\AI Video Creator\backend\temp_video_parts\scene_3.mp4'
+file 'A:\AI Projects\AI Video Creator\backend\temp_video_parts\scene_4.mp4'
+file 'A:\AI Projects\AI Video Creator\backend\temp_video_parts\scene_5.mp4'
+file 'A:\AI Projects\AI Video Creator\backend\temp_video_parts\scene_6.mp4'

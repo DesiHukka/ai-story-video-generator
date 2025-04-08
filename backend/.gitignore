@@ -1,0 +1,15 @@
+# Node
+node_modules/
+.env
+dist/
+output/
+audio/
+images/
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
+
+credentials/google-tts.json

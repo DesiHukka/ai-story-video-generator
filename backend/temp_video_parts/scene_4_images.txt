@@ -1,0 +1,8 @@
+file 'A:\AI Projects\AI Video Creator\backend\images\output_1743888395489_1.jpg'
+duration 2
+file 'A:\AI Projects\AI Video Creator\backend\images\output_1743888395829_2.jpg'
+duration 2
+file 'A:\AI Projects\AI Video Creator\backend\images\output_1743888396157_3.jpg'
+duration 2
+file 'A:\AI Projects\AI Video Creator\backend\images\output_1743888397424_4.jpg'
+duration 2

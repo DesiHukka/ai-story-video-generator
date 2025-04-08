@@ -1,0 +1,22 @@
+[
+  {
+    "scene_number": 1,
+    "narration": "A beautiful sunrise over a quiet forest.",
+    "description": "Golden light pierces through misty trees.",
+    "images": [
+      "./images/output_1743888323270_1.jpg",
+      "./images/output_1743889824314_1.jpg"
+    ],
+    "audio": "./audio/scene_1.mp3"
+  },
+  {
+    "scene_number": 2,
+    "narration": "Birds soar across a pink and blue sky.",
+    "description": "Flocks fly above a mountain range.",
+    "images": [
+      "./images/output_1743889824588_2.jpg",
+      "./images/output_1743889868952_1.jpg"
+    ],
+    "audio": "./audio/scene_2.mp3"
+  }
+]

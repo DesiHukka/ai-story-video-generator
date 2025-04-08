@@ -1,0 +1,130 @@
+[
+  {
+    "name": "_C_Auth",
+    "value": "",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "SRCHD",
+    "value": "AF",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "SRCHUID",
+    "value": "V",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "MUID",
+    "value": "2CD347A27F1D69072829521C7E3868EB",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "_clck",
+    "value": "1itagxi%7C2%7Cfum%7C0%7C1914",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "ANON",
+    "value": "A",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "NAP",
+    "value": "V",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "PPLState",
+    "value": "1",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "_U",
+    "value": "1FwPNd8MULCjmZJ-OAd1MseZF23mgh71grcnuuEoKraFpDgbSrPP1RGWEgOu21nHo3B2hrlttvinZ9_cjp36nWkiSrJjb_dhwTyRZRdz4Zjroq1BoOkjm6d2jCDyK-YKg6-EDwukolNqVPPQq_V5IhuyZ24fppgVjLAhbfc6WVGgVhVTodzfoLrfF4eSS-3vQ3tgy-55cI-5Z1mrpGgFEqvYp1HLnfdGd6Hr1qIJiKD4",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "WLS",
+    "value": "C",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "SRCHUSR",
+    "value": "DOB",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "SRCHHPGUSR",
+    "value": "SRCHLANG",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "_SS",
+    "value": "SID",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "_RwBf",
+    "value": "mta",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "MMCASM",
+    "value": "ID",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "_clsk",
+    "value": "dm7isj%7C1743273809805%7C4%7C0%7Cn.clarity.ms%2Fcollect",
+    "domain": ".bing.com",
+    "path": "/",
+    "httpOnly": false,
+    "secure": true
+  }
+]
