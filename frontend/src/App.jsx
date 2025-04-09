@@ -21,12 +21,12 @@ export default function App() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/story-to-video",
+        "http://13.201.83.234:5000/api/story-to-video",
         { story }
       );
       const { videoPath } = response.data;
 
-      setVideoPath(`http://localhost:5000/${videoPath}`);
+      setVideoPath(`http://13.201.83.234:5000/${videoPath}`);
     } catch (err) {
       console.error("Error generating video:", err);
       alert("Failed to generate video. Please try again.");
