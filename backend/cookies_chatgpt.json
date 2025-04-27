@@ -1,0 +1,110 @@
+[
+  {
+    "name": "oai-did",
+    "value": "21413bc9-645a-4efd-a592-99bc67889819",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "__Secure-next-auth.session-token",
+    "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..81Y9hT78jp4zryb1.854brSQmWI0hAbFJ3HjCDoRWbMEDlbc7JSiv_fuV20HGjJBHqahZ6SMeQp_mhSg5z34YcawG-SwKR5cGizbN0FefnqrUf1Xggafaz2_ZtWNIUPTjC7R2EHVs3VAT5JWuzle6khuBbL1Nl5psbgkjmZ9LenTr7gpywC2NDk5m6t3B9WM10Hg_TKqFyPJoTvnTTrU6BQ4a9wprkmddYQ7LGJIHNM0a47OXuhEY9uYEpGgJYMYLHVJD_KIU80cGfKVk3zRwN_a4TRN2bgjB50bNUN4IR87Vge7G3xkqcPD_quOkM3qgK4qdTMUi42jkNJHtAZfgW9YCMB-2QXCehi3O3xhORoE_k8yegwxd65Ra8FflFeSDbjIlaGweAmm_eHtPw8qiNyH3--JAoOUDmNZ6BiCul1itOGI3Dy8ENrNQkJ5QT8FI9l5FSR2aWWtg9Io7ul053UxXoloZlvRv44qmNT4Ttb8TgXopO_gzbcvwXubLzr07PBxC1cGWO2d7DrEqSpaY-P6PtXC027e9QyXomvEsllpUTEODL1Rot87ZolrygfIkffznjO1XYV7WXhUCMERpjbbSdm4RSrgotK6huqztA-jl_IDvZgKfiJP4OpHl6dTi-QA-Ahjx3OodrH2faPXHwvef20pBEtD4RKRc4-MWhRfYK3RfsoWZKaXBXSUJQ0rJFUkJMOKo6lYotB-haVx8Mg9hWq8yVTlO0TDGtSV7eb-oqF2GieRDP3CaRSydRsynzXRiwowUc8b205n5E3dNxM18BpPyrTOC0UoTeyvOcJOyhBB7X7nttAuNatfzS_xsWj0VJ2un_3NZBdudb1EvWuw4yl1Ddw3Vc-fwdUbwx-zGRIke7DI6DYa8e1nucs2iggvsEDmSyQGdAjkRe2pDYjFNGhzwWe0LfJiZOEPiorxVBga-nqkWvzk4uomkOXQLmuADL9Y4TV3nItyrIJnbvPgAE5pYqAnacteL8wXP6v8kV9-FsuJcqbfDxJhkgljUVY0mRA93LiMaVoFBsWg1O7v3xvIkUwdtCoIsfvJslAGgfpUxgmcRT_DH_lyGNbFYCDU8hgfENpQHOSlq7lBWSu6DnOzbtm9_dD9AWaOgi7x7LAfx5YN8MNnbnCnJaKaoi0iYohh2vktJ8AhZXTMBP67XvkSAQGGKgUq_Q2_OM2bhQsZab1jGGR395q9x33e9bTbPTT76r0I0lpOcxYGGM8QqEvw_oUvtDA8ovSmp1KuLFQFpyPG5pJC3MAZwdUz__4lBmSi6zGLbj-Hgl7mhJ7xqI1A9a8S8evgtG85EwEEbiUTd3uAU87JWqG1Eq9egP-sTMQ4GAEzjdyGmnTkjlvCUj8tfK-1pcSRSFLksT6XBNFgIZs9Sc4_NAg1E44AKlGLYUvrxW9MkkObzu60iDsGFfzFlhNluzAKJAw6AYw_IK3FhBvVAEF42lKWXLRJlO8yPR09Q16RGNPwZ6GxrgQGs5sI1MQ26H18Cf2Edco9gpf0sMIlUiykiTuwHzZjSHB5q0mfv06dfh25ygcNsuHjYccE7pdUbirk0yFed-dCfEhYdgIR8ZdPPJgMUw2Wt7iE10gN-6eBDpvG3Zqa4Aru1mil1v94iZnUZyW73r76DznduFMbIspbMMPPBkW84hBOjashQCmaGNMvqWM5ONHwJyMhxF9y8hAvj3pVPs6flhEN4-AcE792goNXp32Wii8W8zPF8HLilKOYgLcwxbsaXRLNsrzgz7ZPQR0_3TFCmUVxJ0cYKUQqwq1cR9JxqH8FncPjGWohQkOjCv9MSBqGB212HDnWsoDBeeFyi3D7G5sTjLOA4qpLJM-yYpyVwlrESUdYWWWFG-MlzoXfw8ytR3oo-q2BM_HbJK_y5waEvxQpmm1jfQZmQCEPAa1ESf6za0saZN-uIlzGIkX_mH6ksl_tI2TXwcsph9rmj1zxG7amN9wIIWvDsrhonShO2fEOGtJ5T5YDlG56QXN9VY6iRPxG5-1iZa2YjKiJsuBcFwr0uX8iJD8uSTNgqnKQC08dWzAatGDkasfH1h7-gxNhKEi_8A-uXTkpmcB6mFHKPdgVPJebJYNIueFI6tAFZPwafNpwJddJ5lStLoukVVzpogs-Rym7B3cDvhUaNC-S2V-ML3x15gCRpkGI3r2zeagAaxqk4w0LFXtthq4nZCKtAzXaAM7ohY0aoMZkcB3jAWJly4U7KI5YkdC3Mai3xMr5YrW2ARHUm7SSMm9ecoU99a8Zfv88sInyka277f1tzOfCF45qCDPqcWvJb5lHrMwT-xtTy3sMpGcspNQK78tQA4uhzVka_B_CwnUrvOlQn26oG4P5mUSqy0cVFdiolMbrrQ40Nfx2vCnN1L6IA9h1XQjnl9ZPjC5o2BfgEyaIT7RqZKPPGJEfF--lTKx6-QjTjIfUc9ZK-3q-xTKwQmP3Ju7dFNKmbaTBC5yWCcNmPFg3JRDSRAtrCTBypcuUzxnYEwOL_T9Rg13AALLfLur42v3noNJXqlLK_JiTI1BbmT47284EZAOPzoMZcZTnPzsReAJpU10_yfCfAgwMVj1ah9Fn9i70c36s4zHRMWwIfRvPwfOpZaOpi8ojVtcC11--Gu7S9Gux6uk4BmxJRg7fN9iGzS9szOUBlYtlo5RW1yNLjPsALDQfVBjv52KpRLu20Gpm9Gqa1yGm70lIDTCUkQ3OZlwPXGtmFzmLBDf2Q33RtwX6JAh9mpddUpuGVwEaJG2ViJwyQ60YvI16F60Q4fm1PZmWntm-RWI1WoBC_UjSKNiFDUQf1pin6kWsiqP39Fj5FYEwVSEKA4Vm0R4ZN0KsZ1oIr-jhS0raNAR13hbraO4W6WnLdTqdUzZ6ysBxmKE6xfSbMj9qT2duWa9snF_meLp9UkrR4frzT1foENS4_uJLST-kVw4V1bY3LA4ao1XS5K9FRkrx4Ux7PcPIHWgOfnaqj6TRl-BmLWdZ7CzhEewL8I_jyUXezykWvXjTjKMV7ADgk8PT8IpvnQtLsyeOEvjE5bjTAFn2peOa48GQniKel7QBfBLIGOEECi1_xGt8zZxi03Q-6O9IWAXur6Ycqrj9ayWJFuo0JSPiGIVl7MFKYG-ePgVfnDEqDc8efAL3kRNwnibdS1U7xW2AkvPxcHAQ8TumhQ-QimiVeOFHA141Q39uOgfi_zCgZGjxCJ6k9TtPZphbyjUfaA0xgjy5sxaUqmSEbCsBnM7ILLszplxKuR0ktNfwjXkqxT0DMfHM_tlZv9iEjAc9O8DLn3z4VtUZS8VxnE9BPSv_8gA7Gmq18Qv2WDne09G7N-28sd0Hv3EZU_lUQEth-8spiW75h1zmnGAOrlyjJUpezFhc3RGOYm18G8Ijzwl1t_xJtKj-mhcXnOlY2JzjqIcd0CJJsTGPtrQgVPsTS1YyuU8nMwSjds0NMl6VhsUQwTRohQEIEYWi_M8ZC-NeD6b7UY_0KkbiRmCbmdPhW5yJz6jFJPwYIKEy515STxfgehlkceOiNJToQasnS-fSQdA59TnuT.3G_hfdL-QGFt7GFWg43z2g",
+    "domain": ".chatgpt.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "__Secure-next-auth.callback-url",
+    "value": "https%3A%2F%2Fchatgpt.com%2F",
+    "domain": ".chatgpt.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "oai-hlib",
+    "value": "true",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "oai-allow-ne",
+    "value": "false",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "oai-nav-state",
+    "value": "1",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "oai-last-model",
+    "value": "gpt-4o-mini",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "_puid",
+    "value": "user-hsJdjCkJYjfKUryMn5LikTnC:1745177364-PwQhSFNxeXEWkK5Okuy9fR0CkdtdcvcsvLWPMno2J9Y%3D",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "oai-sc",
+    "value": "0gAAAAABoBVhf6t6xfowV1tt9JAktGFbxWomy5IOADT3mxWCflAwxkeCcIX32nD1IX9fClmuMOIHKQsxQP-5cuq8AvJyrGHbpNpsBIUrduYrX51LiOGno80TO4pG5idsjqGNs2kLE8eGOrgbnGQZKElx4ezXtqQzoi8Im1O_NTuKiGq6JQ9hEUqugD28dHA21TQnRoz4jxXBhNx41MQcGjWfBYjxAw6dTosbQ_4lUGdieWBmFtZEdRCE",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "oai-gn",
+    "value": "",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "oai-hm",
+    "value": "SHOULD_WE_BEGIN%20%7C%20READY_WHEN_YOU_ARE",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "_dd_s",
+    "value": "rum",
+    "domain": "chat.openai.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false,
+    "sameSite": "Lax"
+  }
+]

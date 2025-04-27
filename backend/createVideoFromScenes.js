@@ -1,199 +1,209 @@
 const fs = require("fs");
 const path = require("path");
 const ffmpeg = require("fluent-ffmpeg");
-const { v4: uuidv4 } = require("uuid");
+const ffmpegPath = require("ffmpeg-static");
+const { spawn } = require("child_process");
 
+// Point fluent-ffmpeg at the static binary
+ffmpeg.setFfmpegPath(ffmpegPath);
+
+/**
+ * Create a video sequence from scene images and audio tracks.
+ * @param {Array} scenes - Array of { scene_number, images: [paths], audio: path }
+ * @param {string} outputPath - Final output .mp4 path
+ */
 async function createVideoFromScenes(scenes, outputPath) {
   try {
     const tempDir = path.join(__dirname, "temp_clips");
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+    fs.mkdirSync(tempDir, { recursive: true });
 
+    // Helper to probe audio length
     const getAudioDuration = (audioPath) =>
       new Promise((resolve, reject) => {
-        ffmpeg.ffprobe(audioPath, (err, metadata) => {
-          if (err) reject(err);
-          else resolve(metadata.format.duration);
-        });
+        ffmpeg.ffprobe(audioPath, (err, meta) =>
+          err ? reject(err) : resolve(meta.format.duration)
+        );
       });
 
     const sceneVideos = [];
 
     for (const scene of scenes) {
-      const images = Array.isArray(scene.images) ? scene.images : [];
-      const audio = scene.audio;
+      const imgs = (scene.images || []).filter((f) => fs.existsSync(f));
+      if (!imgs.length || !fs.existsSync(scene.audio)) continue;
 
-      if (!images.length || !audio) continue;
+      const audioDur = await getAudioDuration(scene.audio);
+      const sceneOut = path.join(tempDir, `scene_${scene.scene_number}.mp4`);
 
-      const sceneVideo = path.join(tempDir, `scene_${scene.scene_number}.mp4`);
-      const transitionDuration = 1;
-
-      const verifiedImages = images.filter((imgPath) => fs.existsSync(imgPath));
-
-      if (!verifiedImages.length) continue;
-
-      const audioDuration = await getAudioDuration(audio);
-
-      if (verifiedImages.length === 1) {
-        const singleImage = verifiedImages[0];
-        const intermediateVideo = path.join(
-          tempDir,
-          `scene_${scene.scene_number}_images.mp4`
-        );
-
-        await new Promise((resolve, reject) => {
+      // Single-image: just loop it
+      if (imgs.length === 1) {
+        await new Promise((res, rej) => {
           ffmpeg()
-            .addInput(singleImage)
-            .loop(audioDuration)
+            .addInput(imgs[0])
+            .loop(audioDur)
+            .addInput(scene.audio)
             .outputOptions([
-              "-t",
-              audioDuration.toString(),
               "-vf",
               "scale=1280:720,format=yuv420p",
+              "-c:v",
+              "libx264",
+              "-c:a",
+              "aac",
+              "-tune",
+              "stillimage",
+              "-t",
+              audioDur.toString(),
               "-r",
               "25",
-              "-pix_fmt",
-              "yuv420p",
             ])
-            .save(intermediateVideo)
-            .on("end", () => resolve())
-            .on("error", reject);
+            .save(sceneOut)
+            .on("end", () => (sceneVideos.push(sceneOut), res()))
+            .on("error", rej);
         });
-
-        await new Promise((resolve, reject) => {
-          ffmpeg()
-            .addInput(intermediateVideo)
-            .addInput(audio)
-            .outputOptions([
-              "-c:v libx264",
-              "-c:a aac",
-              "-tune stillimage",
-              `-t ${audioDuration}`,
-            ])
-            .save(sceneVideo)
-            .on("end", () => {
-              sceneVideos.push(sceneVideo);
-              resolve();
-            })
-            .on("error", reject);
-        });
-
         continue;
       }
 
-      const ffmpegPath = require("ffmpeg-static");
-      const { spawn } = require("child_process");
+      // Multi-image: use xfade transitions
+      const minSec = 3;
+      let slots = Math.floor(audioDur / minSec);
+      slots = Math.max(1, Math.min(slots, imgs.length));
+      const picked = imgs.slice(0, slots);
 
+      // Revert to single-image logic if only one slot
+      if (picked.length === 1) {
+        await new Promise((res, rej) => {
+          ffmpeg()
+            .addInput(picked[0])
+            .loop(audioDur)
+            .addInput(scene.audio)
+            .outputOptions([
+              "-vf",
+              "scale=1280:720,format=yuv420p",
+              "-c:v",
+              "libx264",
+              "-c:a",
+              "aac",
+              "-tune",
+              "stillimage",
+              "-t",
+              audioDur.toString(),
+              "-r",
+              "25",
+            ])
+            .save(sceneOut)
+            .on("end", () => (sceneVideos.push(sceneOut), res()))
+            .on("error", rej);
+        });
+        continue;
+      }
+
+      // Evenly split durations
+      const segDur = [];
+      let acc = 0;
+      for (let i = 0; i < picked.length; i++) {
+        const d =
+          i === picked.length - 1 ? audioDur - acc : audioDur / picked.length;
+        segDur.push(d);
+        acc += d;
+      }
+
+      // Build inputs & filters
       const args = [];
-      const durations = [];
-
-      let usedDuration = 0;
-      for (let i = 0; i < verifiedImages.length; i++) {
-        let duration;
-        if (i === verifiedImages.length - 1) {
-          duration = audioDuration - usedDuration;
-        } else {
-          duration = audioDuration / verifiedImages.length;
-          usedDuration += duration;
-        }
-        durations.push(duration);
+      picked.forEach((img, i) => {
         args.push(
           "-loop",
           "1",
           "-t",
-          duration.toString(),
+          segDur[i].toString(),
           "-i",
-          path.resolve(verifiedImages[i])
+          path.resolve(img)
         );
+      });
+      args.push("-i", scene.audio);
+
+      // Scale labels
+      const scales = picked
+        .map((_, i) => `[${i}:v]scale=1280:720,format=yuv420p[fv${i}]`)
+        .join(";");
+      // Chain xfade
+      let filter = scales;
+      let prev = "[fv0]";
+      let offset = segDur[0];
+      for (let i = 1; i < picked.length; i++) {
+        const cur = `[fv${i}]`;
+        const out = i === picked.length - 1 ? "[vout]" : `[x${i}]`;
+        const start = Math.max(offset - 1, 0);
+        filter += `;${prev}${cur}xfade=duration=1:offset=${start}${out}`;
+        prev = out;
+        offset += segDur[i];
       }
 
-      const filterParts = [];
-      let lastOutput = `[0:v]`;
-      let cumulativeOffset = durations[0];
-
-      for (let i = 1; i < verifiedImages.length; i++) {
-        const curInput = `[${i}:v]`;
-        const outLabel = `[vout${i}]`;
-        const offset = cumulativeOffset - transitionDuration;
-        filterParts.push(
-          `${lastOutput}${curInput}xfade=transition=fade:duration=${transitionDuration}:offset=${offset}${outLabel}`
+      // Run xfade -> intermediate
+      const interm = path.join(tempDir, `scene_${scene.scene_number}_img.mp4`);
+      await new Promise((res, rej) => {
+        const proc = spawn(
+          ffmpegPath,
+          [
+            "-y",
+            ...args,
+            "-filter_complex",
+            filter,
+            "-map",
+            "[vout]",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-r",
+            "25",
+            interm,
+          ],
+          { stdio: ["ignore", "ignore", "inherit"] }
         );
-        lastOutput = outLabel;
-        cumulativeOffset += durations[i];
-      }
-
-      const intermediateVideo = path.join(
-        tempDir,
-        `scene_${scene.scene_number}_images.mp4`
-      );
-
-      await new Promise((resolve, reject) => {
-        const fadeProcess = spawn(ffmpegPath, [
-          "-y",
-          ...args,
-          "-filter_complex",
-          filterParts.join("; "),
-          "-map",
-          lastOutput,
-          "-fps_mode",
-          "cfr",
-          "-r",
-          "25",
-          "-pix_fmt",
-          "yuv420p",
-          intermediateVideo,
-        ]);
-
-        fadeProcess.on("close", (code) => {
-          if (code === 0) resolve();
-          else reject(new Error(`❌ FFmpeg exited with code ${code}`));
-        });
+        proc.on("close", (code) =>
+          code === 0 ? res() : rej(new Error("xfade failed"))
+        );
       });
 
-      await new Promise((resolve, reject) => {
+      // Merge audio
+      await new Promise((res, rej) => {
         ffmpeg()
-          .addInput(intermediateVideo)
-          .addInput(audio)
+          .addInput(interm)
+          .addInput(scene.audio)
           .outputOptions([
-            "-c:v libx264",
-            "-c:a aac",
-            "-tune stillimage",
-            `-t ${audioDuration}`,
+            "-c:v",
+            "copy",
+            "-c:a",
+            "aac",
+            "-t",
+            audioDur.toString(),
           ])
-          .save(sceneVideo)
-          .on("end", () => {
-            sceneVideos.push(sceneVideo);
-            resolve();
-          })
-          .on("error", reject);
+          .save(sceneOut)
+          .on("end", () => (sceneVideos.push(sceneOut), res()))
+          .on("error", rej);
       });
     }
 
-    if (sceneVideos.length === 0) return;
+    // Concatenate all scenes
+    if (!sceneVideos.length) return;
     if (sceneVideos.length === 1) {
       fs.copyFileSync(sceneVideos[0], outputPath);
       return;
     }
-
-    const listPath = path.join(tempDir, `concat_list.txt`);
-    fs.writeFileSync(
-      listPath,
-      sceneVideos.map((file) => `file '${file}'`).join("\n")
-    );
-
-    await new Promise((resolve, reject) => {
+    const list = path.join(tempDir, "concat.txt");
+    fs.writeFileSync(list, sceneVideos.map((f) => `file '${f}'`).join("\n"));
+    await new Promise((res, rej) => {
       ffmpeg()
-        .input(listPath)
+        .input(list)
         .inputOptions("-f", "concat", "-safe", "0")
         .outputOptions("-c", "copy")
         .save(outputPath)
-        .on("end", () => resolve())
-        .on("error", reject);
+        .on("end", res)
+        .on("error", rej);
     });
 
-    console.log("✅ Final video created at:", outputPath);
-    return outputPath;
-  } catch (err) {
-    console.error("❌ Error in createVideoFromScenes:", err.message);
+    console.log(`✅ Video built at ${outputPath}`);
+  } catch (e) {
+    console.error("❌ createVideoFromScenes error:", e);
   }
 }
 
