@@ -9,7 +9,7 @@ export default function Preview() {
 
   useEffect(() => {
     const s = sessionStorage.getItem("scenes");
-    const v = sessionStorage.getItem("videoPath");
+    const v = sessionStorage.getItem("videoUrl");
     if (!s) return navigate("/");
     setScenes(JSON.parse(s));
     setVideoUrl(v);
@@ -26,7 +26,7 @@ export default function Preview() {
           <p className="mb-2">{scene.narration}</p>
           {scene.imageUrls?.[0] && (
             <img
-              src={import.meta.env.VITE_BACKEND_LOCAL + scene.imageUrls[0]}
+              src={import.meta.env.VITE_BACKEND + scene.imageUrls[0]}
               alt={`Scene ${scene.scene_number}`}
               className="w-full rounded"
             />
@@ -34,7 +34,7 @@ export default function Preview() {
           {scene.audioUrl && (
             <audio
               controls
-              src={import.meta.env.VITE_BACKEND_LOCAL + scene.audioUrl}
+              src={import.meta.env.VITE_BACKEND + scene.audioUrl}
               className="w-full mt-2"
             />
           )}
@@ -51,7 +51,7 @@ export default function Preview() {
       {showVideo && (
         <video
           controls
-          src={import.meta.env.VITE_BACKEND_LOCAL + videoUrl}
+          src={import.meta.env.VITE_BACKEND + videoUrl}
           className="w-full mt-6 rounded-lg shadow-lg"
         />
       )}

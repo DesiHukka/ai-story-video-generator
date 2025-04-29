@@ -1,31 +1,25 @@
+// storyToScenes.js
 require("dotenv").config();
 const OpenAI = require("openai");
 const fs = require("fs");
 const path = require("path");
+const pLimit = require("p-limit").default;
+
 const { synthesizeSpeech } = require("./tts");
 const { generateImages } = require("./imageGen");
-const { createVideoFromScenes } = require("./createVideoFromScenes");
 const { fallbackGenerateImagesChatGPT } = require("./fallbackImageGenChatGPT");
-const pLimit = require("p-limit").default;
 const { cached } = require("./cache");
-
-// wrap the cached function to log hits/misses
-const rawCached = cached;
-async function cachedWithLog(key, fn, type) {
-  const keyStr = JSON.stringify(key);
-  console.log(`🔍 cache lookup for ${keyStr}`);
-  // you’ll see here whether the cache module actually retrieves or generates
-  const result = await rawCached(key, fn, type);
-  console.log(`✅ cache returned for ${keyStr}`);
-  return result;
-}
+const { createVideoFromScenes } = require("./createVideoFromScenes");
 
 const client = new OpenAI({
   baseURL: "https://models.inference.ai.azure.com",
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// helper: break long story into ≤ maxLen‑char chunks on paragraph boundaries
+// ————————————————————————————————
+// 0) Utilities
+// ————————————————————————————————
+
 function chunkStory(story, maxLen = 2000) {
   const paras = story.split(/\n\s*\n/);
   const chunks = [];
@@ -34,7 +28,6 @@ function chunkStory(story, maxLen = 2000) {
   for (let p of paras) {
     if ((buffer + "\n\n" + p).length > maxLen) {
       if (buffer) chunks.push(buffer);
-      // paragraph itself might be too big: force push and reset
       buffer = p.length > maxLen ? p.slice(0, maxLen) : p;
     } else {
       buffer = buffer ? buffer + "\n\n" + p : p;
@@ -44,22 +37,29 @@ function chunkStory(story, maxLen = 2000) {
   return chunks;
 }
 
-async function splitStoryIntoScenes(story, type = "kids", outputPath) {
-  try {
-    if (!story) throw new Error("Story input is required");
+async function cachedWithLog(key, fn, type) {
+  const keyStr = JSON.stringify(key);
+  console.log(`🔍 cache lookup for ${keyStr}`);
+  const result = await cached(key, fn, type);
+  console.log(`✅ cache returned for ${keyStr}`);
+  return result;
+}
+
+// ————————————————————————————————
+// 1) planScenes: just ask GPT for the raw scene list
+// ————————————————————————————————
+
+async function planScenes(story, type = "kids") {
+  if (!story) throw new Error("Story input is required");
+
+  const allScenes = [];
+  let sceneOffset = 0;
+
+  for (let chunk of chunkStory(story, 2000)) {
+    // build the prompt…
     let prompt;
-    // 1) chunk the story
-    const parts = chunkStory(story, 2000);
-    let allScenes = [];
-    let sceneOffset = 0;
-
-    for (let i = 0; i < parts.length; i++) {
-      const chunk = parts[i];
-
-      // 2) build the prompt for *just* this chunk, telling GPT where to start numbering
-
-      if (type === "general") {
-        prompt = `You are an AI script writer helping generate a video from a story. Your task is to break the story into sequential scenes.
+    if (type === "general") {
+      prompt = `You are an AI script writer helping generate a video from a story. Your task is to break the story into sequential scenes.
 
 Start numbering at ${sceneOffset + 1}. Each scene should include:
 - "scene_number": A number starting from 1.
@@ -76,27 +76,27 @@ SSML Guidelines for "ttl":
 
 Return your result as a JSON array of scenes.
 Story:
-    """
-    ${chunk}
-    """
-    
-    Respond **only** with JSON (no additional text). Example format:
-    [
-      {
-        "scene_number": 1,
-        "narration": "Narration here...",
-        "description": "Visual description here...",
-        "ttl": An SSML-formatted version of the narration. Use expressive speech with prosody, pauses, and emphasis to make the narration sound more human and emotional.
-      },
-      {
-        "scene_number": 2,
-        "narration": "Narration here...",
-        "description": "Visual description here...",
-        "ttl": An SSML-formatted version of the narration. Use expressive speech with prosody, pauses, and emphasis to make the narration sound more human and emotional.
-      }
-    ]`;
-      } else {
-        prompt = `i will provide you a story. You have to create scenes from it. each scene should contain detailed description in english, which should let dall-e to easily understand and generate proper images. Also, try to give each character same characteristics like what color they are wearing, so that each scene has same type of settings. So, in each scene you will have to redeclare every detail of characters and surroundings again and again. this should make each scene's prompt independent but still alike. Also, try to make description in under 500 characters. Let me give you an example of what each prompt should consider:
+  """
+  ${chunk}
+  """
+  
+  Respond **only** with JSON (no additional text). Example format:
+  [
+    {
+      "scene_number": 1,
+      "narration": "Narration here...",
+      "description": "Visual description here...",
+      "ttl": An SSML-formatted version of the narration. Use expressive speech with prosody, pauses, and emphasis to make the narration sound more human and emotional.
+    },
+    {
+      "scene_number": 2,
+      "narration": "Narration here...",
+      "description": "Visual description here...",
+      "ttl": An SSML-formatted version of the narration. Use expressive speech with prosody, pauses, and emphasis to make the narration sound more human and emotional.
+    }
+  ]`;
+    } else {
+      prompt = `i will provide you a story. You have to create scenes from it. each scene should contain detailed description in english, which should let dall-e to easily understand and generate proper images. Also, try to give each character same characteristics like what color they are wearing, so that each scene has same type of settings. So, in each scene you will have to redeclare every detail of characters and surroundings again and again. this should make each scene's prompt independent but still alike. Also, try to make description in under 500 characters. Let me give you an example of what each prompt should consider:
 
 characters: provide age, clothes, hair style, color, mood
 surrounding: Describe the surrounding irrespective of the previous prompt
@@ -128,83 +128,83 @@ Start numbering at ${sceneOffset + 1}. Each scene should include:
 
 Return your result as a JSON array of scenes.
 Story:
-    """
-    ${chunk}
-    """
-    
-    Respond **only** with JSON (no additional text). Example format:
-    [
-      {
-        "scene_number": 1,
-        "narration": "Narration here...",
-        "description": "Visual description here...",
+  """
+  ${chunk}
+  """
+  
+  Respond **only** with JSON (no additional text). Example format:
+  [
+    {
+      "scene_number": 1,
+      "narration": "Narration here...",
+      "description": "Visual description here...",
+    },
+    {
+      "scene_number": 2,
+      "narration": "Narration here...",
+      "description": "Visual description here...",
+    }
+  ]`;
+    }
+
+    // call GPT (cached)
+    const chatText = await cachedWithLog(
+      ["planScenes", type, chunk],
+      async () => {
+        const resp = await client.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: "You are a scriptwriter…" },
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.7,
+        });
+        return resp.choices[0].message.content.trim();
       },
-      {
-        "scene_number": 2,
-        "narration": "Narration here...",
-        "description": "Visual description here...",
-      }
-    ]`;
-      }
-      // 🧠 Request AI response
+      "json"
+    );
 
-      const chatResult = await cachedWithLog(
-        ["splitScenes", type, chunk],
-        async () => {
-          const response = await client.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are a scriptwriter who structures stories into sequential scenes.",
-              },
-              { role: "user", content: prompt },
-            ],
-            temperature: 0.7,
-          });
-          return response.choices[0].message.content.trim();
-        }
-      );
+    // parse JSON
+    const jsonText = chatText.replace(/```json|```/g, "");
+    const scenes = JSON.parse(jsonText);
 
-      // 🛠 Clean the response: Remove possible Markdown JSON blocks
-      let text = chatResult.replace(/```json|```/g, "");
+    // renumber
+    scenes.forEach((s) => (s.scene_number += sceneOffset));
+    allScenes.push(...scenes);
+    sceneOffset = allScenes.length;
+  }
 
-      // ✅ Parse JSON safely
-      let scenes = JSON.parse(text);
+  return allScenes;
+}
 
-      // 3) renumber and accumulate
-      scenes = scenes.map((s) => ({
-        ...s,
-        scene_number: s.scene_number + sceneOffset,
-      }));
-      allScenes.push(...scenes);
-      sceneOffset = allScenes.length;
-    }
+// ————————————————————————————————
+// 2) processScenes: synth + images + fallback + video, with onProgress(stage…)
+// ————————————————————————————————
 
-    // Ensure audio directory exists
-    const audioDir = path.join(__dirname, "audio");
-    if (!fs.existsSync(audioDir)) {
-      fs.mkdirSync(audioDir);
-    }
+async function processScenes(scenes, outputPath, onProgress = () => {}) {
+  // ensure audio dir
+  const audioDir = path.join(__dirname, "audio");
+  if (!fs.existsSync(audioDir)) fs.mkdirSync(audioDir);
 
-    // cap to 4 concurrent tasks
-    const limit = pLimit(2);
+  const limit = pLimit(2);
+  const fallbackLimit = pLimit(1);
+  const total = scenes.length;
+  let done = 0;
 
-    // fallback queue of 1 at a time
-    const fallbackLimit = pLimit(1);
-
-    // create a task per scene
-    const tasks = allScenes.map((scene) =>
+  // for each scene
+  await Promise.all(
+    scenes.map((scene) =>
       limit(async () => {
-        // 1) synthesize narration
+        // 1️⃣ start TTS
+        onProgress(
+          done,
+          total,
+          `Scene ${scene.scene_number}: synthesizing speech…`
+        );
         const narrationPath = path.join(
           audioDir,
           `scene_${scene.scene_number}.mp3`
         );
-
-        // returns the path to the file (so that if cached we skip re-generation)
-
         scene.audio = await cachedWithLog(
           ["tts", scene.ttl || scene.narration],
           async () => {
@@ -214,61 +214,63 @@ Story:
           "binary"
         );
 
-        // 2) generate images
-        // 2) generate images with 2‑step retry + fallback
+        // 2️⃣ generate images
+        onProgress(
+          done,
+          total,
+          `Scene ${scene.scene_number}: generating images…`
+        );
         let images = [];
         try {
-          // 1️⃣ original prompt
-
           images = await cachedWithLog(
             ["images", scene.description],
             () => generateImages(scene.description),
             "json"
           );
-          if (!images.length) throw new Error("empty");
-        } catch (err1) {
-          console.warn(
-            `⚠️ Scene ${scene.scene_number}: original prompt failed, trying safe twist…`
-          );
+          if (!images.length) throw new Error();
+        } catch {
           try {
-            // 2️⃣ “safer” twist
-            const safePrompt = `${scene.description}. Please render this scene in a fully family‑friendly, non‑violent style but keep the quality very eye catchy.`;
+            const safePrompt = `${scene.description}. Please render fully family-friendly.`;
             images = await generateImages(safePrompt);
-            if (!images.length) throw new Error("empty");
-          } catch (err2) {
-            console.warn(
-              `⚠️ Scene ${scene.scene_number}: safe twist also failed — using Puppeteer fallback…`
-            );
-            // 3️⃣ queued fallback (only one Puppeteer at a time)
+            if (!images.length) throw new Error();
+          } catch {
             images = await fallbackLimit(() =>
               fallbackGenerateImagesChatGPT(scene.description, 2)
             );
           }
         }
-
         scene.images = images;
+
+        // 3️⃣ done with this scene
+        done += 1;
+        onProgress(done, total, `Completed scene ${scene.scene_number}`);
       })
-    );
+    )
+  );
 
-    // fire off up to 4 normal tasks; fallback calls within them will queue down to 1
-    await Promise.all(tasks);
-    // 4) stitch it all into one video
-    await createVideoFromScenes(allScenes, outputPath);
-    console.log(`🎥 Final video created at: ${outputPath}`);
+  // 4️⃣ finally stitch the video
+  onProgress(done, total, "Stitching final video…");
+  await createVideoFromScenes(scenes, outputPath);
 
-    return { scenes: allScenes, videoPath: outputPath };
-  } catch (error) {
-    console.error("Error generating scenes:", error.message);
-    throw new Error("Failed to generate story scenes");
-  }
+  return { scenes, videoPath: outputPath };
 }
 
-// Example test
-// const testStory = fs.readFileSync("test_story.txt", "utf-8");
+// ————————————————————————————————
+// 3) convenience: plan + process in one
+// ————————————————————————————————
 
-// const outputPath = path.join(__dirname, "final_output.mp4");
-// splitStoryIntoScenes(testStory, "kids", outputPath).then((scenes) => {
-//   console.log(JSON.stringify(scenes, null, 2));
-// });
+async function splitStoryIntoScenes(
+  story,
+  type = "kids",
+  outputPath,
+  onProgress
+) {
+  const scenes = await planScenes(story, type);
+  return processScenes(scenes, outputPath, onProgress);
+}
 
-module.exports = { splitStoryIntoScenes };
+module.exports = {
+  planScenes,
+  processScenes,
+  splitStoryIntoScenes,
+};
