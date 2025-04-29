@@ -17,6 +17,7 @@ export default function useGenerateScenes() {
       const scenes = [];
       const params = new URLSearchParams({ story, type });
       const url = `${import.meta.env.VITE_BACKEND}/generate-stream?${params}`;
+      console.log(url);
       const es = new EventSource(url, { withCredentials: true });
 
       // Progress %
