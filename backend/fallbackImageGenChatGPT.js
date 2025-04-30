@@ -96,11 +96,11 @@ async function fallbackGenerateImagesChatGPT(prompt, n = 2) {
 }
 
 // Example
-fallbackGenerateImagesChatGPT(
-  "Chhutki, in her red frock with white polka dots, stands at the edge of the forest, her expression filled with worry as she watches two men cutting down trees with axes. The men wear brown shirts and hats, surrounded by fallen logs and sawdust. The forest in the background looks vibrant but threatened. Chhutki turns and runs toward the deeper forest to find the fairy queen.",
-  2
-)
-  .then((files) => console.log("Downloaded:", files))
-  .catch(console.error);
+// fallbackGenerateImagesChatGPT(
+//   "Chhutki, in her red frock with white polka dots, stands at the edge of the forest, her expression filled with worry as she watches two men cutting down trees with axes. The men wear brown shirts and hats, surrounded by fallen logs and sawdust. The forest in the background looks vibrant but threatened. Chhutki turns and runs toward the deeper forest to find the fairy queen.",
+//   2
+// )
+//   .then((files) => console.log("Downloaded:", files))
+//   .catch(console.error);
 
 module.exports = { fallbackGenerateImagesChatGPT };
