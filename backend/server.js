@@ -9,9 +9,10 @@ const { splitStoryIntoScenes } = require("./storyToScenes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const FRONTEND = process.env.FRONTEND;
+const FRONTEND_LOCAL = process.env.FRONTEND_LOCAL;
 
 // 1) CORS + JSON body parsing
-app.use(cors({ origin: FRONTEND, credentials: true }));
+app.use(cors({ origin: FRONTEND_LOCAL, credentials: true }));
 app.use(express.json());
 
 // 2) Ensure our public dirs exist
@@ -39,7 +40,7 @@ function handleGenerateStream(req, res) {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache, no-transform",
     Connection: "keep-alive",
-    "Access-Control-Allow-Origin": FRONTEND,
+    "Access-Control-Allow-Origin": FRONTEND_LOCAL,
     "Access-Control-Allow-Credentials": "true",
   });
   res.flushHeaders();
@@ -113,7 +114,10 @@ function handleGenerateStream(req, res) {
 }
 
 // 5) Preflight for SSE POST
-app.options("/generate-stream", cors({ origin: FRONTEND, credentials: true }));
+app.options(
+  "/generate-stream",
+  cors({ origin: FRONTEND_LOCAL, credentials: true })
+);
 
 // 6) SSE endpoints
 app.get("/generate-stream", handleGenerateStream);

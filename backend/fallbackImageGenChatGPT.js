@@ -16,11 +16,16 @@ puppeteer.use(StealthPlugin());
 async function fallbackGenerateImagesChatGPT(prompt, n = 2) {
   if (!prompt) throw new Error("Prompt is required");
 
+  // const browser = await puppeteer.launch({
+  //   headless: true,
+  //   executablePath:
+  //     "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", // adjust for your platform
+  //   userDataDir: "A:\\AI Projects\\chrome copy1\\User Data",
+  //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  // });
+
   const browser = await puppeteer.launch({
-    headless: true,
-    executablePath:
-      "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", // adjust for your platform
-    userDataDir: "A:\\AI Projects\\chrome copy1\\User Data",
+    headless: false,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
@@ -91,11 +96,11 @@ async function fallbackGenerateImagesChatGPT(prompt, n = 2) {
 }
 
 // Example
-// fallbackGenerateImagesChatGPT(
-//   "Chhutki, in her red frock with white polka dots, stands at the edge of the forest, her expression filled with worry as she watches two men cutting down trees with axes. The men wear brown shirts and hats, surrounded by fallen logs and sawdust. The forest in the background looks vibrant but threatened. Chhutki turns and runs toward the deeper forest to find the fairy queen.",
-//   2
-// )
-//   .then((files) => console.log("Downloaded:", files))
-//   .catch(console.error);
+fallbackGenerateImagesChatGPT(
+  "Chhutki, in her red frock with white polka dots, stands at the edge of the forest, her expression filled with worry as she watches two men cutting down trees with axes. The men wear brown shirts and hats, surrounded by fallen logs and sawdust. The forest in the background looks vibrant but threatened. Chhutki turns and runs toward the deeper forest to find the fairy queen.",
+  2
+)
+  .then((files) => console.log("Downloaded:", files))
+  .catch(console.error);
 
 module.exports = { fallbackGenerateImagesChatGPT };

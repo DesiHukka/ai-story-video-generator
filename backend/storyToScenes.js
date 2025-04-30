@@ -3,7 +3,6 @@ require("dotenv").config();
 const OpenAI = require("openai");
 const fs = require("fs");
 const path = require("path");
-const pLimit = require("p-limit").default;
 
 const { synthesizeSpeech } = require("./tts");
 const { generateImages } = require("./imageGen");
@@ -186,6 +185,8 @@ async function processScenes(scenes, outputPath, onProgress = () => {}) {
   const audioDir = path.join(__dirname, "audio");
   if (!fs.existsSync(audioDir)) fs.mkdirSync(audioDir);
 
+  // dynamically import pLimit (p-limit v4 is an ESM module)
+  const { default: pLimit } = await import("p-limit");
   const limit = pLimit(2);
   const fallbackLimit = pLimit(1);
   const total = scenes.length;
